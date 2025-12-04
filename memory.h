@@ -18,7 +18,7 @@ int memory_write(struct memory* mem, uint16_t address, uint8_t value);
 
 int memory_read( struct memory* mem, uint16_t address, uint8_t* out);
 
-int memory_load(struct memory* mem, const char* filename);
+int memory_load_rom(struct memory* mem, const char* filename, uint16_t start_address);
 
-
+uint16_t memory_read_instruction(struct memory* mem, uint16_t addr);
 #endif
