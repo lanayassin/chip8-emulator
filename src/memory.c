@@ -1,4 +1,4 @@
-#include "memory.h"
+#include "include/memory.h"
 #include <string.h>
 
 int memory_write(struct memory* mem, uint16_t address, uint8_t value){
@@ -32,4 +32,3 @@ uint16_t memory_read_instruction(struct memory* mem, uint16_t addr) {
     return (mem->data[addr] << 8) | mem->data[addr + 1];
 }
 
-//lana la plus belle

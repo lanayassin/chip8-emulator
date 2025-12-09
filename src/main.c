@@ -1,5 +1,5 @@
-#include "memory.h"
-#include "misc/debug.h"
+#include "include/memory.h"
+#include "include/misc/debug.h"
 
 
 int main(int argc, char** argv) {
