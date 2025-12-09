@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "memory.h"
+#include "display/display.h"
 
 #define NB_REGISTERS 16
 
