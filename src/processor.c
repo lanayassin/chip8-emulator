@@ -21,4 +21,10 @@ void processor_destroy(struct processor *cpu) {
     free(cpu->V);
     free(cpu);
     return;
-}
+};
+
+uint16_t processor_fetch(struct processor *cpu) {
+    uint16_t opcode = memory_read_instruction(cpu->RAM, cpu->PC);
+    cpu->PC += 2;
+    return opcode;
+};
