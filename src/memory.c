@@ -1,5 +1,5 @@
 
-#include "include/memory.h"
+#include "memory.h"
 #include <string.h>
 
 int memory_write(struct memory* mem, uint16_t address, uint8_t value) {
@@ -16,12 +16,18 @@ int memory_read(struct memory* mem, uint16_t address, uint8_t* out) {
 
 int memory_load_rom(struct memory* mem, const char* filename, uint16_t start_address) {
     if (!mem || !filename) return -1;
+
+    if (start_address >= MEMORY_SIZE) return -1;
+
     FILE* f = fopen(filename, "rb");
     if (!f) return -1;
 
     size_t space = MEMORY_SIZE - start_address;
     size_t nread = fread(&mem->data[start_address], 1, space, f);
     fclose(f);
+
+    if (nread == 0) return -1;
+    
     return (int)nread;
 }
 
