@@ -4,6 +4,7 @@
 #include "memory.h"
 #include "processor.h"
 #include "display/display.h"
+#include "misc/debug.h"
 
 int main(void) {
     struct memory mem = {0};
@@ -30,6 +31,8 @@ int main(void) {
 
     for (int i = 0; i < 39; ++i) {
         processor_step(&cpu);
+        printf(instruction_as_str(&cpu));
+        printf("\n");
         usleep(50000);
         (void)Display_update(&dsp);
     }
