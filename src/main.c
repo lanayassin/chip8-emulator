@@ -8,7 +8,8 @@
 int main(void) {
     struct memory mem = {0};
 
-    if (memory_load_rom(&mem, "./1-chip8-logo.ch8", START_ADDRESS) <= 0) {
+
+    if (memory_load_rom(&mem, "1-chip8-logo.ch8", START_ADDRESS) <= 0) {
         fprintf(stderr, "Erreur: chargement ROM\n");
         return 1;
     }
@@ -29,6 +30,7 @@ int main(void) {
 
     for (int i = 0; i < 39; ++i) {
         processor_step(&cpu);
+        usleep(50000);
         (void)Display_update(&dsp);
     }
 

@@ -39,7 +39,7 @@ static inline int check_pc2(struct processor *cpu) {
 uint16_t processor_fetch(struct processor *cpu) {
     assert(cpu&&cpu->RAM);
     if (check_pc2(cpu)!=0) {
-        printf(stderr, "PC out of bounds before fetch: PC=0x%03X\n", cpu->PC);
+        fprintf(stderr, "PC out of bounds before fetch: PC=0x%03X\n", cpu->PC);
         return 0;
     }
     uint16_t opcode = memory_read_instruction(cpu->RAM, cpu->PC);
@@ -79,11 +79,13 @@ void processor_step(struct processor *cpu) {
         }
         case 0xD: { 
             struct Sprite spr;
-            spr.length = n;
+            if(Sprite_init(&spr,n)!=0) {
+                break;
+            }
             for (uint8_t i = 0; i < spr.length; ++i) {
                 uint8_t b = 0;
                 memory_read(cpu->RAM, (uint16_t)(cpu->I + i), &b);
-                spr.contents[i] = b;
+                Sprite_add(&spr, b);
             }
             uint8_t VF = 0;
             if (cpu->Display) {

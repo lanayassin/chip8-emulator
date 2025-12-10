@@ -13,7 +13,7 @@ SRC	:= src/memory.c src/processor.c src/main.c
 OBJ	:= $(SRC:.c=.o)
 BIN	:= chip8
 
-.PHONY: all clean run
+.PHONY: all clean run valgrind
 
 all: $(BIN)
 
@@ -28,3 +28,7 @@ clean:
 
 run: $(BIN)
 	./$(BIN)
+
+# --- Ajout ultra pratique ! ---
+valgrind: $(BIN)
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(BIN)
