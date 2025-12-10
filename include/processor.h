@@ -26,7 +26,7 @@ struct processor {
 
 int processor_init(struct processor *cpu, struct memory* ram, struct Display* display);
 
-void processor_destroy(struct processor *cpu);
+void processor_destroy(struct processor **cpu);
 
 uint16_t processor_fetch(struct processor *cpu);
 
