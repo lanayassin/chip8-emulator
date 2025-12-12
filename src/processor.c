@@ -46,7 +46,7 @@ uint16_t processor_fetch(struct processor *cpu) {
     }
 
     uint16_t opcode = memory_read_instruction(cpu->RAM, cpu->PC);
-    cpu->PC += 2; // avancer le PC de 2 octets
+    cpu->PC += 2; 
     return opcode;
 }
 
@@ -113,7 +113,6 @@ void processor_step(struct processor *cpu) {
         }
 
         default:
-            // instructions non implémentées
             break;
     }
 }
