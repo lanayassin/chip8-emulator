@@ -33,9 +33,10 @@ int main(void) {
         processor_step(&cpu);
         printf(instruction_as_str(&cpu));
         printf("\n");
-        usleep(50000);
         (void)Display_update(&dsp);
+
     }
+    usleep(100000);
 
     Display_destroy(&dsp);
     return 0;
