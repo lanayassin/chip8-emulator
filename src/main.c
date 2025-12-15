@@ -10,7 +10,7 @@ int main(void) {
     struct memory mem = {0};
 
 
-    if (memory_load_rom(&mem, "1-chip8-logo.ch8", START_ADDRESS) <= 0) {
+    if (memory_load_rom(&mem, "2-ibm-logo.ch8", START_ADDRESS) <= 0) {
         fprintf(stderr, "Erreur: chargement ROM\n");
         return 1;
     }
@@ -29,14 +29,12 @@ int main(void) {
         return 1;
     }
 
-    for (int i = 0; i < 39; ++i) {
+    for (int i = 0; i < 40; ++i) {
         processor_step(&cpu);
-        printf(instruction_as_str(&cpu));
-        printf("\n");
         (void)Display_update(&dsp);
 
     }
-    usleep(100000);
+    usleep(100000000);
 
     Display_destroy(&dsp);
     return 0;

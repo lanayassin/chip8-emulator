@@ -22,6 +22,8 @@ struct processor {
     uint16_t stack[STACK_SIZE];
     struct memory * RAM;
     struct Display * Display;
+    struct Keyboard * Keyboard;
+    struct Speaker * Speaker;
 };
 
 int processor_init(struct processor *cpu, struct memory* ram, struct Display* display);
