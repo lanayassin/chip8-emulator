@@ -3,11 +3,12 @@
 #include "memory.h"
 
 
-opcode_handler dispatch[16] = {
-    op_0, op_1, op_2, op_3, op_4, op_5, op_6, op_7,
-    op_8, op_9, op_A, op_B, op_C, op_D, op_E, op_F
+void (*dispatch[16])(struct processor *cpu, uint16_t opcode) = {
+    op_0, op_1, op_2, op_3,
+    op_4, op_5, op_6, op_7,
+    op_8, op_9, op_A, op_B,
+    NULL, op_D, NULL, op_F
 };
-
 
 // 0x0000 : Instructions Système
 void op_0(struct processor *cpu, uint16_t opcode) {
@@ -69,11 +70,11 @@ void op_5(struct processor *cpu , uint16_t opcode){
 void op_6(struct processor *cpu , uint16_t opcode){
     uint8_t x = (opcode & 0x0F00) >> 8 ;
     uint8_t kk = opcode & 0x00FF;
-    cpu->V[x] == kk ;
+    cpu->V[x] = kk ;
 }
 
 // 7xkk : ADD Vx, byte
-void op_7(stuct processor *cpu , uint16_t opcode){
+void op_7(struct processor *cpu , uint16_t opcode){
     uint8_t x = (opcode & 0x0F00) >> 8 ;
     uint8_t kk = opcode & 0x00FF;
     cpu->V[x] += kk ;
@@ -144,13 +145,13 @@ void op_9 (struct processor *cpu , uint16_t opcode){
 }
 
 //Annn : LD I, addr
-void op_A(struct proccesor *cpu , uint16_t opcode){
+void op_A(struct processor *cpu , uint16_t opcode){
     uint16_t adrr = opcode & 0x0FFF ;
     cpu->I = adrr ; 
 }
 
 //Bnnn : JP V0, addr
-void op_B(struct proccesor *cpu , uint16_t opcode){
+void op_B(struct processor *cpu , uint16_t opcode){
     uint16_t adrr = opcode & 0x0FFF ;
     cpu->PC = adrr + cpu->V[0];
 }
@@ -186,22 +187,19 @@ void op_F(struct processor *cpu, uint16_t opcode) {
     }
 
     if (nn == 0x0A) {
-        int key = keyboard_get_pressed(cpu->Keyboard);
+        uint8_t key_pressed = 0;
 
-        if (key<0) {
-            cpu->PC -= 2;
-        }
-        else {
-            cpu->V[x] = (uint8_t)key;
-        }
+        Keyboard_wait(cpu->Keyboard, &key_pressed);
+
+        cpu->V[x] = key_pressed;
     }
 
     if (nn == 0x15) {
-        cpu->DT = V[x];
+        cpu->DT = cpu->V[x];
     }
 
     if (nn == 0x18) {
-        cpu->ST = V[x];
+        cpu->ST = cpu->V[x];
     }
 
     if (nn == 0x1E) {
@@ -209,7 +207,7 @@ void op_F(struct processor *cpu, uint16_t opcode) {
     }
 
     if (nn == 0x29) {
-        cpu->I = (START_FONT_ADRESS) + (cpu->V[x] * 5)
+        cpu->I = (START_FONT_ADRESS) + (cpu->V[x] * 5);
     }
 
     if (nn == 0x33) {
