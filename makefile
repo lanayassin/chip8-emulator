@@ -9,7 +9,7 @@ SDL2L	:= $(shell pkg-config --libs sdl2)
 
 PROVIDED	:= lib/x86_64/libprovided.a
 
-SRC	:= src/memory.c src/processor.c src/main.c
+SRC := src/memory.c src/processor.c src/main.c src/opcode.c
 OBJ	:= $(SRC:.c=.o)
 BIN	:= chip8
 

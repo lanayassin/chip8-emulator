@@ -89,7 +89,7 @@ int Keyboard_get (const struct Keyboard* keyboard, uint8_t key, int* state);
  * \memberof Keyboard
  * \brief    Waits for any key to be pressed.
  * \param    keyboard The keyboard to be observed.
- * \param    pressed  The location where the key pressed is to be stored.
+ * \param      The location where the key pressed is to be stored.
  * \return   0 on success, 1 in case of an error (\ref errcode is set to indicate the error).
  *
  * This function is blocking.
@@ -102,3 +102,4 @@ int Keyboard_wait (const struct Keyboard* keyboard, uint8_t* pressed);
 
 // ifndef INPUT_KEYBOARD_H
 #endif
+pressed
