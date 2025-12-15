@@ -35,7 +35,7 @@ void op_1(struct processor *cpu , uint16_t opcode) {
 void op_2(struct processor *cpu , uint16_t opcode){
     uint16_t adrr = opcode & 0x0FFF ;
     cpu->stack[cpu->SP++] = cpu->PC;
-    cpu->PC = addr;
+    cpu->PC = adrr;
 }
 
 // 0x3xkk : SE Vx, byte 
@@ -79,7 +79,60 @@ void op_7(stuct processor *cpu , uint16_t opcode){
     cpu->V[x] += kk ;
 }
 
-//8.. A FAIRE
+// 8xyN
+void op_8(struct processor *cpu, uint16_t opcode) {
+    uint8_t x = (opcode & 0x0F00) >> 8;
+    uint8_t y = (opcode & 0x00F0) >> 4;
+    uint8_t n = (opcode & 0x000F);
+
+    // 8xy0 : LD Vx, Vy
+    if (n == 0x0) {
+        cpu->V[x] = cpu->V[y];
+    }
+    // 8xy1 : OR Vx, Vy
+    else if (n == 0x1) {
+        cpu->V[x] |= cpu->V[y];
+    }
+    // 8xy2 : AND Vx, Vy
+    else if (n == 0x2) {
+        cpu->V[x] = cpu->V[x] & cpu->V[y];
+    }
+    // 8xy3 : XOR Vx, Vy
+    else if (n == 0x3) {
+       cpu->V[x] = cpu->V[x] ^ cpu->V[y];
+    }
+    // 8xy4 : ADD Vx, Vy (Attention au Carry Flag VF)
+    else if (n == 0x4) {
+        uint16_t resultat = cpu->V[x] +cpu->V[y];
+        if (resultat > 255) {
+        cpu->V[0xF] = 1;
+        }
+        else{
+        cpu->V[0xF] = 0;
+        }
+        cpu->V[x] = resultat;
+    }
+    // 8xy5 : SUB Vx, Vy (VF = NOT Borrow)
+    else if (n == 0x5) {
+        cpu->V[0xF] = (cpu->V[x] >= cpu->V[y]) ? 1 : 0; // 1 si pas d'emprunt
+        cpu->V[x] -= cpu->V[y];
+    }
+    // 8xy6 : SHR Vx (Décalage à droite)
+    else if (n == 0x6) {
+        cpu->V[0xF] = cpu->V[x] & 0x1; // On sauve le bit qui va sortir
+        cpu->V[x] >>= 1;
+    }
+    // 8xy7 : SUBN Vx, Vy (Vy - Vx)
+    else if (n == 0x7) {
+        cpu->V[0xF] = (cpu->V[y] >= cpu->V[x]) ? 1 : 0;
+        cpu->V[x] = cpu->V[y] - cpu->V[x];
+    }
+    // 8xyE : SHL Vx (Décalage à gauche)
+    else if (n == 0xE) {
+        cpu->V[0xF] = (cpu->V[x] & 0x80) >> 7; // On sauve le bit de poids fort (MSB)
+        cpu->V[x] <<= 1;
+    }
+}
 
 //9xy0 : SNE Vx, Vy
 void op_9 (struct processor *cpu , uint16_t opcode){
@@ -100,6 +153,28 @@ void op_A(struct proccesor *cpu , uint16_t opcode){
 void op_B(struct proccesor *cpu , uint16_t opcode){
     uint16_t adrr = opcode & 0x0FFF ;
     cpu->PC = adrr + cpu->V[0];
+}
+
+//Dxyn - DRW Vx, Vy, nibble
+void op_D(struct processor *cpu, uint16_t opcode) {
+    uint8_t x = (opcode & 0x0F00) >> 8 ;
+    uint8_t y = (opcode & 0x00F0) >> 4 ;
+    uint8_t n = (opcode & 0x000F);
+    struct Sprite spr;
+    if (Sprite_init(&spr, n) != 0) return;
+
+    for (uint8_t i = 0; i < n; ++i) {
+        uint8_t byte = 0;
+        memory_read(cpu->RAM, cpu->I + i, &byte);
+        Sprite_add(&spr, byte);
+    }
+
+    uint8_t VF = 0;
+    if (cpu->Display) {
+        Display_DRW(cpu->Display, &spr, cpu->V[x], cpu->V[y], &VF);
+    }
+    cpu->V[0xF] = VF ? 1 : 0;
+    Sprite_destroy(&spr);
 }
 
 void op_F(struct processor *cpu, uint16_t opcode) {
