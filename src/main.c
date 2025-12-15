@@ -12,7 +12,7 @@ int main(void) {
     struct memory mem = {0};
 
 
-    if (memory_load_rom(&mem, "5-quirks.ch8", START_ADDRESS) <= 0) {
+    if (memory_load_rom(&mem, "6-keypad.ch8", START_ADDRESS) <= 0) {
         fprintf(stderr, "Erreur: chargement ROM\n");
         return 1;
     }
@@ -41,7 +41,6 @@ int main(void) {
 
     while (1) {
         processor_step(&cpu);
-        usleep(200);
         (void)Display_update(&dsp);
 
     }
@@ -51,6 +50,3 @@ int main(void) {
     return 0;
 }
 
-//cest pas vrai
-
-//lana la plus belle
