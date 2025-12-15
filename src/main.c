@@ -5,6 +5,8 @@
 #include "processor.h"
 #include "display/display.h"
 #include "misc/debug.h"
+#include "keyboard/keyboard.h"
+#include "speaker/speaker.h"
 
 int main(void) {
     struct memory mem = {0};
@@ -20,16 +22,24 @@ int main(void) {
         fprintf(stderr, "Erreur: init Display (SDL)\n");
         return 1;
     }
-    (void)Display_set_colors(&dsp, 0, 0, 0, 255, 255, 255);
+    (void)Display_set_colors(&dsp, 0, 0, 0, 255, 38, 227);
 
+    struct Keyboard kb;
+    if (Keyboard_init(&kb) != 0) {
+        fprintf(stderr, "Erreur: init Keyboard (SDL)\n");
+        return 1;
+    }
+    
     struct processor cpu;
-    if (processor_init(&cpu, &mem, &dsp) != 0) {
+    if (processor_init(&cpu, &mem, &dsp, &kb) != 0) {
         fprintf(stderr, "Erreur: init CPU\n");
         Display_destroy(&dsp);
+        Keyboard_destroy(&kb);
         return 1;
     }
 
-    for (int i = 0; i < 10000; ++i) {
+
+    while (1) {
         processor_step(&cpu);
         usleep(200);
         (void)Display_update(&dsp);

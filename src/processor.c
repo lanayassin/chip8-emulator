@@ -8,7 +8,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-int processor_init(struct processor *cpu, struct memory* ram, struct Display* display) {
+int processor_init(struct processor *cpu, struct memory* ram, struct Display* display, struct Keyboard* Keyboard) {
     if (!cpu || !ram) return -1;
     memset(cpu->V, 0, sizeof(cpu->V));
     cpu->I = 0;
@@ -23,6 +23,7 @@ int processor_init(struct processor *cpu, struct memory* ram, struct Display* di
 
     cpu->RAM     = ram;
     cpu->Display = display;
+    cpu->Keyboard = Keyboard;
     return 0;
 }
 

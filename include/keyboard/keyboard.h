@@ -102,4 +102,3 @@ int Keyboard_wait (const struct Keyboard* keyboard, uint8_t* pressed);
 
 // ifndef INPUT_KEYBOARD_H
 #endif
-pressed

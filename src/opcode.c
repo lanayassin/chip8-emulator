@@ -1,13 +1,13 @@
 #include "opcode.h"
 #include "processor.h"
 #include "memory.h"
-
+#include <stdlib.h>
 
 void (*dispatch[16])(struct processor *cpu, uint16_t opcode) = {
     op_0, op_1, op_2, op_3,
     op_4, op_5, op_6, op_7,
     op_8, op_9, op_A, op_B,
-    NULL, op_D, NULL, op_F
+    op_C, op_D, op_E, op_F
 };
 
 // 0x0000 : Instructions Système
@@ -156,6 +156,15 @@ void op_B(struct processor *cpu , uint16_t opcode){
     cpu->PC = adrr + cpu->V[0];
 }
 
+//Cxkk - RND Vx, byte
+void op_C(struct processor *cpu , uint16_t opcode) {
+    uint8_t x = (opcode & 0x0F00) >> 8;
+    uint8_t kk = (opcode & 0x00FF);
+
+    uint8_t rnd = (uint8_t)(rand() % 256);
+
+    cpu->V[x] = rnd & kk;
+}
 //Dxyn - DRW Vx, Vy, nibble
 void op_D(struct processor *cpu, uint16_t opcode) {
     uint8_t x = (opcode & 0x0F00) >> 8 ;
@@ -178,6 +187,28 @@ void op_D(struct processor *cpu, uint16_t opcode) {
     Sprite_destroy(&spr);
 }
 
+void op_E(struct processor *cpu, uint16_t opcode){
+    uint8_t x  = (opcode & 0x0F00) >> 8;
+    uint8_t nn = (opcode & 0x00FF);
+    int state;
+
+    if (nn==0xA1) {
+        if (Keyboard_get(cpu->Keyboard, cpu->V[x], &state)==0){
+            if (state==0) {
+                cpu->PC += 2;
+            }
+        }
+    }
+
+    if (nn==0x9E) {
+        if (Keyboard_get(cpu->Keyboard, cpu->V[x], &state)==0) {
+            if (state == 1) {
+                cpu->PC += 2;
+            }
+        }
+    }
+}
+
 void op_F(struct processor *cpu, uint16_t opcode) {
     uint8_t x  = (opcode & 0x0F00) >> 8;
     uint8_t nn = (opcode & 0x00FF);
@@ -187,11 +218,14 @@ void op_F(struct processor *cpu, uint16_t opcode) {
     }
 
     if (nn == 0x0A) {
-        uint8_t key_pressed = 0;
+        uint8_t key;
+        int res = Keyboard_wait(cpu->Keyboard, &key);
+        if (res==0) {
+                cpu->V[x] = key;
+        } else {
+            cpu->PC -=2;
+        }
 
-        Keyboard_wait(cpu->Keyboard, &key_pressed);
-
-        cpu->V[x] = key_pressed;
     }
 
     if (nn == 0x15) {
