@@ -219,15 +219,11 @@ void op_F(struct processor *cpu, uint16_t opcode) {
     }
 
     if (nn == 0x0A) {
-        uint8_t key;
-        int res = Keyboard_wait(cpu->Keyboard, &key);
-        if (res==0) {
-                cpu->V[x] = key;
-        } else {
-            cpu->PC -=2;
-        }
-
+        cpu->waiting_for_key = 1;
+        cpu->waiting_reg = x;
+        return; 
     }
+
 
     if (nn == 0x15) {
         cpu->DT = cpu->V[x];

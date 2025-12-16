@@ -12,7 +12,7 @@ int main(void) {
     struct memory mem = {0};
 
 
-    if (memory_load_rom(&mem, "6-keypad.ch8", START_ADDRESS) <= 0) {
+    if (memory_load_rom(&mem, "7-beep.ch8", START_ADDRESS) <= 0) {
         fprintf(stderr, "Erreur: chargement ROM\n");
         return 1;
     }
@@ -48,9 +48,9 @@ int main(void) {
     while (1) {
         processor_step(&cpu);
         (void)Display_update(&dsp);
+        processor_update_timer(&cpu); 
 
     }
- 
 
     Display_destroy(&dsp);
     return 0;

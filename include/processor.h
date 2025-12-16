@@ -24,6 +24,10 @@ struct processor {
     struct Display * Display;
     struct Keyboard * Keyboard;
     struct Speaker * Speaker;
+    uint32_t dt_last_update;
+
+    int waiting_for_key;
+    uint8_t waiting_reg;
 };
 
 int processor_init(struct processor *cpu, struct memory* ram, struct Display* display, struct Keyboard* Keyboard, struct Speaker* Speaker);
