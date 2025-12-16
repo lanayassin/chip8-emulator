@@ -26,7 +26,7 @@ struct processor {
     struct Speaker * Speaker;
 };
 
-int processor_init(struct processor *cpu, struct memory* ram, struct Display* display, struct Keyboard* Keyboard);
+int processor_init(struct processor *cpu, struct memory* ram, struct Display* display, struct Keyboard* Keyboard, struct Speaker* Speaker);
 
 void processor_destroy(struct processor **cpu);
 

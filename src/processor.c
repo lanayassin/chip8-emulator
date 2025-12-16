@@ -4,11 +4,12 @@
 #include "opcode.h"
 #include "display/sprite.h"
 #include "display/display.h"
+#include "keyboard/keyboard.h"
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
 
-int processor_init(struct processor *cpu, struct memory* ram, struct Display* display, struct Keyboard* Keyboard) {
+int processor_init(struct processor *cpu, struct memory* ram, struct Display* display, struct Keyboard* Keyboard, struct Speaker* Speaker) {
     if (!cpu || !ram) return -1;
     memset(cpu->V, 0, sizeof(cpu->V));
     cpu->I = 0;
@@ -24,6 +25,8 @@ int processor_init(struct processor *cpu, struct memory* ram, struct Display* di
     cpu->RAM     = ram;
     cpu->Display = display;
     cpu->Keyboard = Keyboard;
+    cpu->Speaker = Speaker;
+
     return 0;
 }
 
@@ -55,7 +58,7 @@ uint16_t processor_fetch(struct processor *cpu) {
 
 void processor_step(struct processor *cpu) {
     assert(cpu && cpu->RAM);
-
+    
     uint16_t opcode = processor_fetch(cpu);
     uint8_t op = (opcode & 0xF000) >> 12;
 

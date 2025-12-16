@@ -18,7 +18,7 @@ BIN	:= chip8
 all: $(BIN)
 
 $(BIN): $(OBJ) $(PROVIDED)
-	$(CC) $(CSTD) $(WARN) $(OPT) $(OBJ) -o $@ $(PROVIDED) $(SDL2L)
+	$(CC) $(CSTD) $(WARN) $(OPT) $(OBJ) -o $@ $(PROVIDED) $(SDL2L) -lm
 
 src/%.o: src/%.c
 	$(CC) $(CSTD) $(WARN) $(OPT) $(INCDIRS) $(SDL2C) -c $< -o $@
@@ -29,6 +29,5 @@ clean:
 run: $(BIN)
 	./$(BIN)
 
-# --- Ajout ultra pratique ! ---
 valgrind: $(BIN)
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(BIN)

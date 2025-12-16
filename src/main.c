@@ -30,11 +30,17 @@ int main(void) {
         return 1;
     }
     
+    struct Speaker spk;
+    if (Speaker_init(&spk) !=0) {
+        fprintf(stderr, "Erreur : init speaker\n");
+    }
+
     struct processor cpu;
-    if (processor_init(&cpu, &mem, &dsp, &kb) != 0) {
+    if (processor_init(&cpu, &mem, &dsp, &kb, &spk) != 0) {
         fprintf(stderr, "Erreur: init CPU\n");
         Display_destroy(&dsp);
         Keyboard_destroy(&kb);
+        Speaker_destroy(&spk);
         return 1;
     }
 

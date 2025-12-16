@@ -2,6 +2,7 @@
 #include "processor.h"
 #include "memory.h"
 #include <stdlib.h>
+#include "keyboard/keyboard.h"
 
 void (*dispatch[16])(struct processor *cpu, uint16_t opcode) = {
     op_0, op_1, op_2, op_3,
@@ -194,7 +195,7 @@ void op_E(struct processor *cpu, uint16_t opcode){
 
     if (nn==0xA1) {
         if (Keyboard_get(cpu->Keyboard, cpu->V[x], &state)==0){
-            if (state==0) {
+            if (state==KEY_UP) {
                 cpu->PC += 2;
             }
         }
@@ -202,7 +203,7 @@ void op_E(struct processor *cpu, uint16_t opcode){
 
     if (nn==0x9E) {
         if (Keyboard_get(cpu->Keyboard, cpu->V[x], &state)==0) {
-            if (state == 1) {
+            if (state == KEY_DOWN) {
                 cpu->PC += 2;
             }
         }
