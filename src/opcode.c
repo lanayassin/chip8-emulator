@@ -3,6 +3,9 @@
 #include "memory.h"
 #include <stdlib.h>
 #include "keyboard/keyboard.h"
+#include <stdlib.h>  
+#include <time.h>
+#include <string.h>
 
 void (*dispatch[16])(struct processor *cpu, uint16_t opcode) = {
     op_0, op_1, op_2, op_3,
@@ -35,6 +38,10 @@ void op_1(struct processor *cpu , uint16_t opcode) {
 
 // 0x2nnn : CALL addr
 void op_2(struct processor *cpu , uint16_t opcode){
+    if (cpu->SP >= STACK_SIZE) {
+        fprintf(stderr, "Stack overflow at CALL!\n");
+        exit(1);
+    }
     uint16_t adrr = opcode & 0x0FFF ;
     cpu->stack[cpu->SP++] = cpu->PC;
     cpu->PC = adrr;
@@ -60,11 +67,15 @@ void op_4(struct processor *cpu , uint16_t opcode){
 
 // 5xy0 : SE Vx, Vy
 void op_5(struct processor *cpu , uint16_t opcode){
-    uint8_t x = (opcode & 0x0F00) >> 8 ;
-    uint8_t y = (opcode & 0x00F0) >> 4 ;
-    if (cpu->V[x] == cpu->V[y]){
-        cpu->PC += 2 ;
+    if ((opcode & 0x000F) == 0x0) {
+        uint8_t x = (opcode & 0x0F00) >> 8 ;
+        uint8_t y = (opcode & 0x00F0) >> 4 ;
+        if (cpu->V[x] == cpu->V[y]){
+            cpu->PC += 2 ;
+        }
     }
+
+    
 }
 
 // 6xkk : LD Vx, byte 
@@ -138,10 +149,12 @@ void op_8(struct processor *cpu, uint16_t opcode) {
 
 //9xy0 : SNE Vx, Vy
 void op_9 (struct processor *cpu , uint16_t opcode){
-    uint8_t x = (opcode & 0x0F00) >> 8 ;
-    uint8_t y = (opcode & 0x00F0) >> 4 ;
-    if (cpu->V[x] != cpu->V[y]){
-        cpu->PC += 2 ;
+    if ((opcode & 0x000F) == 0x0) {
+        uint8_t x = (opcode & 0x0F00) >> 8 ;
+        uint8_t y = (opcode & 0x00F0) >> 4 ;
+        if (cpu->V[x] != cpu->V[y]){
+            cpu->PC += 2 ;
+        }
     }
 }
 
@@ -163,8 +176,8 @@ void op_C(struct processor *cpu , uint16_t opcode) {
     uint8_t kk = (opcode & 0x00FF);
 
     uint8_t rnd = (uint8_t)(rand() % 256);
-
-    cpu->V[x] = rnd & kk;
+    
+    cpu->V[x] = rnd & kk;   
 }
 //Dxyn - DRW Vx, Vy, nibble
 void op_D(struct processor *cpu, uint16_t opcode) {
@@ -219,11 +232,12 @@ void op_F(struct processor *cpu, uint16_t opcode) {
     }
 
     if (nn == 0x0A) {
-        cpu->waiting_for_key = 1;
-        cpu->waiting_reg = x;
-        return; 
-    }
+        cpu->waiting_reg    = x;
+        cpu->latched_key    = -1;
+        cpu->key_wait_phase = KEY_WAIT_PRESS;
+        return;
 
+    }
 
     if (nn == 0x15) {
         cpu->DT = cpu->V[x];

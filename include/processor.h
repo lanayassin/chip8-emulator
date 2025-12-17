@@ -12,6 +12,13 @@
 #define NB_REGISTERS 16
 #define STACK_SIZE 16
 
+
+typedef enum {
+    KEY_WAIT_NONE    = 0,
+    KEY_WAIT_PRESS   = 1,
+    KEY_WAIT_RELEASE = 2
+} KeyWaitPhase;
+
 struct processor {
     uint8_t V[NB_REGISTERS];
     uint16_t I;
@@ -26,8 +33,14 @@ struct processor {
     struct Speaker * Speaker;
     uint32_t dt_last_update;
 
-    int waiting_for_key;
-    uint8_t waiting_reg;
+
+    uint8_t     waiting_reg;   
+    KeyWaitPhase key_wait_phase;
+    int8_t      latched_key;
+
+    uint8_t key_prev[16];
+
+
 };
 
 int processor_init(struct processor *cpu, struct memory* ram, struct Display* display, struct Keyboard* Keyboard, struct Speaker* Speaker);

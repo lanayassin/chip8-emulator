@@ -12,7 +12,7 @@ int main(void) {
     struct memory mem = {0};
 
 
-    if (memory_load_rom(&mem, "7-beep.ch8", START_ADDRESS) <= 0) {
+    if (memory_load_rom(&mem, "c8games/MERLIN", START_ADDRESS) <= 0) {
         fprintf(stderr, "Erreur: chargement ROM\n");
         return 1;
     }
@@ -45,14 +45,27 @@ int main(void) {
     }
 
 
-    while (1) {
-        processor_step(&cpu);
-        (void)Display_update(&dsp);
-        processor_update_timer(&cpu); 
+    int running = 1;
+    SDL_Event event;
+    while (running) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                running = 0;
+            }
+        }
 
+        processor_step(&cpu);
+        Display_update(&dsp);
+        processor_update_timer(&cpu);
+        SDL_Delay(1);
     }
 
     Display_destroy(&dsp);
+    Keyboard_destroy(&kb);
+    Speaker_destroy(&spk);
+
     return 0;
+
 }
+
 
