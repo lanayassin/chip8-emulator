@@ -12,7 +12,7 @@ int main(void) {
     struct memory mem = {0};
 
 
-    if (memory_load_rom(&mem, "c8games/TETRIS", START_ADDRESS) <= 0) {
+    if (memory_load_rom(&mem, "c8games/VBRIX", START_ADDRESS) <= 0) {
         fprintf(stderr, "Erreur: chargement ROM\n");
         return 1;
     }
@@ -22,7 +22,7 @@ int main(void) {
         fprintf(stderr, "Erreur: init Display (SDL)\n");
         return 1;
     }
-    (void)Display_set_colors(&dsp, 0, 0, 0, 255, 38, 227);
+    (void)Display_set_colors(&dsp, 255, 200, 255, 255, 38, 227);
 
     struct Keyboard kb;
     if (Keyboard_init(&kb) != 0) {
