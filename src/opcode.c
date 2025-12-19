@@ -104,46 +104,74 @@ void op_8(struct processor *cpu, uint16_t opcode) {
     }
     // 8xy1 : OR Vx, Vy
     else if (n == 0x1) {
-        cpu->V[x] |= cpu->V[y];
+        cpu->V[x] = cpu->V[x] | cpu->V[y];
+        cpu->V[0xF] = 0;
     }
     // 8xy2 : AND Vx, Vy
     else if (n == 0x2) {
         cpu->V[x] = cpu->V[x] & cpu->V[y];
+        cpu->V[0xF] = 0;
     }
     // 8xy3 : XOR Vx, Vy
     else if (n == 0x3) {
-       cpu->V[x] = cpu->V[x] ^ cpu->V[y];
+       cpu->V[x] = cpu-> V[x] ^ cpu->V[y];
+       cpu->V[0xF] = 0;
     }
     // 8xy4 : ADD Vx, Vy (Attention au Carry Flag VF)
     else if (n == 0x4) {
         uint16_t resultat = cpu->V[x] +cpu->V[y];
         if (resultat > 255) {
+        cpu->V[x] = resultat;
         cpu->V[0xF] = 1;
         }
         else{
+        cpu->V[x] = resultat;
         cpu->V[0xF] = 0;
         }
-        cpu->V[x] = resultat;
+
+   
     }
     // 8xy5 : SUB Vx, Vy (VF = NOT Borrow)
     else if (n == 0x5) {
-        cpu->V[0xF] = (cpu->V[x] >= cpu->V[y]) ? 1 : 0; // 1 si pas d'emprunt
-        cpu->V[x] -= cpu->V[y];
+        if (cpu->V[x] >= cpu->V[y]) {
+            cpu->V[x] -= cpu->V[y];
+            cpu->V[0xF] = 1;
+        } else {
+            cpu->V[x] -= cpu->V[y];
+            cpu->V[0xF] = 0;
+        }
     }
     // 8xy6 : SHR Vx (Décalage à droite)
     else if (n == 0x6) {
-        cpu->V[0xF] = cpu->V[x] & 0x1; // On sauve le bit qui va sortir
-        cpu->V[x] >>= 1;
+        if (cpu->V[x] & 0x1) {
+            cpu->V[x] = cpu->V[y] >> 1;
+            cpu->V[0xF] = 1;
+        } else {
+            cpu->V[x] = cpu->V[y] >> 1;
+            cpu->V[0xF] = 0;
+        }
     }
     // 8xy7 : SUBN Vx, Vy (Vy - Vx)
     else if (n == 0x7) {
-        cpu->V[0xF] = (cpu->V[y] >= cpu->V[x]) ? 1 : 0;
-        cpu->V[x] = cpu->V[y] - cpu->V[x];
+        if (cpu->V[y] >= cpu->V[x]) {
+            cpu->V[x] = cpu->V[y] - cpu->V[x];
+            cpu->V[0xF] = 1;
+        } else {
+            cpu->V[x] = cpu->V[y] - cpu->V[x];
+            cpu->V[0xF] = 0;
+        }
     }
     // 8xyE : SHL Vx (Décalage à gauche)
     else if (n == 0xE) {
-        cpu->V[0xF] = (cpu->V[x] & 0x80) >> 7; // On sauve le bit de poids fort (MSB)
-        cpu->V[x] <<= 1;
+        if (cpu->V[x] & 0x80) {
+            cpu->V[x] = cpu->V[y] << 1;
+            cpu->V[0xF] = 1;
+        } else {
+            cpu->V[x]= cpu->V[y] << 1;
+            cpu->V[0xF] = 0;
+        }
+        //cpu->V[0xF] = (cpu->V[x] & 0x80) >> 7; // On sauve le bit de poids fort (MSB)
+        //cpu->V[x] <<= 1;
     }
 }
 
@@ -192,6 +220,14 @@ void op_D(struct processor *cpu, uint16_t opcode) {
         memory_read(cpu->RAM, cpu->I + i, &byte);
         Sprite_add(&spr, byte);
     }
+    if (!cpu->draw_allowed) {
+        cpu->PC -= 2;
+        cpu->stalled = 1; 
+        Sprite_destroy(&spr);
+        return;
+    }
+
+    cpu->draw_allowed = 0;
 
     uint8_t VF = 0;
     if (cpu->Display) {
@@ -267,12 +303,14 @@ void op_F(struct processor *cpu, uint16_t opcode) {
         for (uint8_t i = 0; i <= x; i++) {
             memory_write(cpu->RAM, cpu->I + i, cpu->V[i]);
         }
+        cpu->I += x + 1;
     }
  
     if (nn == 0x65) {
         for (uint8_t i = 0; i <= x; i++) {
             memory_read(cpu->RAM, cpu->I + i, &cpu->V[i]);
         }
+        cpu->I += x + 1;
     }
 }
 

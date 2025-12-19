@@ -33,6 +33,8 @@ struct processor {
     struct Speaker * Speaker;
     uint32_t dt_last_update;
 
+    int  draw_allowed;
+    int stalled;
 
     uint8_t     waiting_reg;   
     KeyWaitPhase key_wait_phase;
@@ -50,5 +52,7 @@ void processor_destroy(struct processor **cpu);
 uint16_t processor_fetch(struct processor *cpu);
 
 void processor_step(struct processor *cpu);
+
+void processor_update_timer(struct processor *cpu);
 
 #endif

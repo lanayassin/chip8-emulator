@@ -8,9 +8,12 @@
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
+#include <time.h>
+#include "speaker/speaker.h"
 
 int processor_init(struct processor *cpu, struct memory* ram, struct Display* display, struct Keyboard* Keyboard, struct Speaker* Speaker) {
     if (!cpu || !ram) return -1;
+    srand((unsigned)time(NULL));
     memset(cpu->V, 0, sizeof(cpu->V));
     cpu->I = 0;
     cpu->PC = START_ADDRESS;
@@ -32,6 +35,9 @@ int processor_init(struct processor *cpu, struct memory* ram, struct Display* di
     cpu->waiting_reg    = 0xFF;
     cpu->key_wait_phase = KEY_WAIT_NONE;
     cpu->latched_key    = -1;
+
+    cpu->draw_allowed = 1;
+    cpu->stalled = 0;
 
     memset(cpu->key_prev, 0, sizeof(cpu->key_prev));
 
@@ -88,7 +94,7 @@ void processor_step(struct processor *cpu) {
             for (uint8_t k = 0; k < 16; ++k) {
                 if (curr[k] && !cpu->key_prev[k]) {
                     cpu->V[cpu->waiting_reg] = k;  
-                    cpu->latched_key = k;
+                    cpu->latched_key = (int8_t)k;
                     cpu->key_wait_phase = KEY_WAIT_RELEASE;
                     break;
                 }
@@ -118,6 +124,10 @@ void processor_step(struct processor *cpu) {
         }
     }
 
+    if (cpu->stalled) {
+        return;  
+    }
+
     uint16_t opcode = processor_fetch(cpu);
     uint8_t op = (opcode & 0xF000) >> 12;
 
@@ -132,7 +142,9 @@ void processor_step(struct processor *cpu) {
 
 void processor_update_timer(struct processor *cpu) {
     Uint32 now = SDL_GetTicks();
-    if (now - cpu->dt_last_update >= 1000 / 60) { 
+    if (now - cpu->dt_last_update >= 1000 / 60) {
+        cpu->draw_allowed = 1;
+        cpu->stalled = 0;
         if (cpu->DT > 0) cpu->DT--;
 
         if (cpu->ST > 0) {

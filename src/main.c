@@ -12,7 +12,7 @@ int main(void) {
     struct memory mem = {0};
 
 
-    if (memory_load_rom(&mem, "c8games/UFO", START_ADDRESS) <= 0) {
+    if (memory_load_rom(&mem, "c8games/TETRIS", START_ADDRESS) <= 0) {
         fprintf(stderr, "Erreur: chargement ROM\n");
         return 1;
     }
