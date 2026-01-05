@@ -1,17 +1,18 @@
-CC		:= gcc
-CSTD	:= -std=c11
-WARN	:= -Wall -Wextra -Wshadow -Wstrict-prototypes -Wconversion
-OPT		:= -O2
-INCDIRS	:= -Iinclude
+CC      := gcc
+CSTD    := -std=c11
+WARN    := -Wall -Wextra -Wshadow -Wstrict-prototypes -Wconversion
+OPT     := -O2
+INCDIRS := -Iinclude
 
-SDL2C	:= $(shell pkg-config --cflags sdl2)
-SDL2L	:= $(shell pkg-config --libs sdl2)
+# SDL2
+SDL2C   := $(shell pkg-config --cflags sdl2 SDL2_ttf)
+SDL2L   := $(shell pkg-config --libs sdl2 SDL2_ttf)
 
-PROVIDED	:= lib/x86_64/libprovided.a
+PROVIDED    := lib/x86_64/libprovided.a
 
 SRC := src/memory.c src/processor.c src/main.c src/opcode.c
-OBJ	:= $(SRC:.c=.o)
-BIN	:= chip8
+OBJ := $(SRC:.c=.o)
+BIN := chip8
 
 .PHONY: all clean run valgrind
 
