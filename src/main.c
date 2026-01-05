@@ -181,50 +181,50 @@ int main(void) {
 
     int emuReady = 0;
 
-while (running) {
-        int mouseX, mouseY;
-        SDL_GetMouseState(&mouseX, &mouseY);
+    while (running) {
+            int mouseX, mouseY;
+            SDL_GetMouseState(&mouseX, &mouseY);
 
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT)
-                running = 0;
+            while (SDL_PollEvent(&event)) {
+                if (event.type == SDL_QUIT)
+                    running = 0;
+
+                if (screen == SCREEN_MENU) {
+                    handle_menu_events(&screen, &running, event);
+                }
+            }
 
             if (screen == SCREEN_MENU) {
-                handle_menu_events(&screen, &running, event);
+                SDL_HideWindow(dsp.window);
+                render_menu(menuRenderer, font, mouseX, mouseY);
+            }
+
+            else if (screen == SCREEN_EMULATION) {
+
+                SDL_ShowWindow(dsp.window);
+
+                if (!emuReady) {
+                    memset(&mem, 0, sizeof(mem));
+                    memory_load_rom(&mem, "c8games/VERS", START_ADDRESS);
+                    processor_init(&cpu, &mem, &dsp, &kb, &spk);
+                    emuReady = 1;
+                }
+
+                processor_step(&cpu);
+                processor_update_timer(&cpu);
+                Display_update(&dsp);
+                SDL_Delay(1);
             }
         }
 
-        if (screen == SCREEN_MENU) {
-            SDL_HideWindow(dsp.window);
-            render_menu(menuRenderer, font, mouseX, mouseY);
-        }
+        Display_destroy(&dsp);
+        Keyboard_destroy(&kb);
+        Speaker_destroy(&spk);
+        TTF_CloseFont(font);
+        TTF_Quit();
+        SDL_Quit();
 
-        else if (screen == SCREEN_EMULATION) {
-
-            SDL_ShowWindow(dsp.window);
-
-            if (!emuReady) {
-                memset(&mem, 0, sizeof(mem));
-                memory_load_rom(&mem, "c8games/VERS", START_ADDRESS);
-                processor_init(&cpu, &mem, &dsp, &kb, &spk);
-                emuReady = 1;
-            }
-
-            processor_step(&cpu);
-            processor_update_timer(&cpu);
-            Display_update(&dsp);
-            SDL_Delay(1);
-        }
+        return 0;
     }
-
-    Display_destroy(&dsp);
-    Keyboard_destroy(&kb);
-    Speaker_destroy(&spk);
-    TTF_CloseFont(font);
-    TTF_Quit();
-    SDL_Quit();
-
-    return 0;
-}
 
 
