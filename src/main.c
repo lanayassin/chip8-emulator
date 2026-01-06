@@ -62,12 +62,14 @@ void handle_select_events(enum Screen* screen, int* running,SDL_Event event, int
         int y = event.button.y;
 
         const char* list_rom[] = {
-            "c8games/15PUZZLE","c8games/BLINKY","c8games/BLITZ","c8games/BRIX",
-            "c8games/CONNECT4","c8games/GUESS","c8games/HIDDEN","c8games/INVADERS",
-            "c8games/KALEID","c8games/MAZE","c8games/MERLIN","c8games/MISSILE",
-            "c8games/PONG","c8games/PONG2","c8games/PUZZLE","c8games/SYZYGY",
-            "c8games/TANK","c8games/TETRIS","c8games/TICTAC","c8games/UFO",
-            "c8games/VBRIX","c8games/VERS","c8games/WIPEOFF", "1-chip8-logo.ch8", "2-ibm-logo.ch8", "3-corax+.ch8", "4-flags.ch8", "5-quirks.ch8", "6-keypad.ch8", "7-beep.ch8"
+            "romCh8/15PUZZLE","romCh8/BLINKY","romCh8/BLITZ","romCh8/BRIX",
+            "romCh8/CONNECT4","romCh8/GUESS","romCh8/HIDDEN","romCh8/INVADERS",
+            "romCh8/KALEID","romCh8/MAZE","romCh8/MERLIN","romCh8/MISSILE",
+            "romCh8/PONG","romCh8/PONG2","romCh8/PUZZLE","romCh8/SYZYGY",
+            "romCh8/TANK","romCh8/TETRIS","romCh8/TICTAC","romCh8/UFO",
+            "romCh8/VBRIX","romCh8/VERS","romCh8/WIPEOFF", "romCh8/1-chip8-logo.ch8",
+             "romCh8/2-ibm-logo.ch8", "romCh8/3-corax+.ch8", "romCh8/4-flags.ch8", "romCh8/5-quirks.ch8",
+              "romCh8/6-keypad.ch8", "romCh8/7-beep.ch8"
         };
 
         int rom_count = sizeof(list_rom) / sizeof(list_rom[0]);
@@ -186,7 +188,7 @@ void render_select(SDL_Renderer* r, TTF_Font* font, int mouseX, int mouseY) {
     SDL_Color normalColor = {255, 38, 227, 255};
     SDL_Color hoverColor  = {150, 0, 150, 255}; // plus foncé
 
-    const char* list_rom [] = {"c8games/15PUZZLE","c8games/BLINKY", "c8games/BLITZ", "c8games/BRIX", "c8games/CONNECT4", "c8games/GUESS", "c8games/HIDDEN", "c8games/INVADERS", "c8games/KALEID", "c8games/MAZE", "c8games/MERLIN", "c8games/MISSILE", "c8games/PONG", "c8games/PONG2", "c8games/PUZZLE", "c8games/SYZYGY", "c8games/TANK", "c8games/TETRIS", "c8games/TICTAC", "c8games/UFO", "c8games/VBRIX", "c8games/VERS", "c8games/WIPEOFF", "1-chip8-logo.ch8", "2-ibm-logo.ch8", "3-corax+.ch8", "4-flags.ch8", "5-quirks.ch8", "6-keypad.ch8", "7-beep.ch8" };
+    const char* list_rom [] = {"15PUZZLE","BLINKY", "BLITZ", "BRIX", "CONNECT4", "GUESS", "HIDDEN", "INVADERS", "KALEID", "MAZE", "MERLIN", "MISSILE", "PONG", "PONG2", "PUZZLE", "SYZYGY", "TANK", "TETRIS", "TICTAC", "UFO", "VBRIX", "VERS", "WIPEOFF", "1-chip8-logo.ch8", "2-ibm-logo.ch8", "3-corax+.ch8", "4-flags.ch8", "5-quirks.ch8", "6-keypad.ch8", "7-beep.ch8" };
     
     int rom_count = sizeof(list_rom) / sizeof(list_rom[0]);
 
