@@ -10,6 +10,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
+#define WINDOW_W 600
+#define WINDOW_H 400
+
+Uint32 ignoreMouseTime = 0;
+int ignoreMouse = 0;
+
 enum Screen {
     SCREEN_MENU,
     SCREEN_ROM_SELECT,
@@ -17,16 +23,19 @@ enum Screen {
 };
 
 void handle_menu_events(enum Screen* screen, int* running, SDL_Event event) {
+
     if (event.type == SDL_MOUSEBUTTONDOWN) {
         int x = event.button.x;
         int y = event.button.y;
-
-        SDL_Rect play = {180, 120, 240, 60};
+        SDL_Rect play = {180, 150, 240, 60};
         SDL_Rect quit = {180, 220, 240, 60};
 
         if (x >= play.x && x <= play.x + play.w &&
             y >= play.y && y <= play.y + play.h) {
-            *screen = SCREEN_EMULATION;
+            *screen = SCREEN_ROM_SELECT;
+
+            ignoreMouse = 1;
+            ignoreMouseTime = SDL_GetTicks() + 200;
         }
 
         if (x >= quit.x && x <= quit.x + quit.w &&
@@ -36,9 +45,73 @@ void handle_menu_events(enum Screen* screen, int* running, SDL_Event event) {
     }
 }
 
+void handle_select_events(enum Screen* screen, int* running,SDL_Event event, int mouseX, int mouseY,const char** selectedRom)
+{
+    if (ignoreMouse) {
+        if (SDL_GetTicks() < ignoreMouseTime) {
+            return; // on ignore ce clic
+        } else {
+            ignoreMouse = 0; // le délai est passé
+        }
+    }
+
+    if (event.type == SDL_MOUSEBUTTONUP &&
+        event.button.button == SDL_BUTTON_LEFT) {
+
+        int x = event.button.x;
+        int y = event.button.y;
+
+        const char* list_rom[] = {
+            "c8games/15PUZZLE","c8games/BLINKY","c8games/BLITZ","c8games/BRIX",
+            "c8games/CONNECT4","c8games/GUESS","c8games/HIDDEN","c8games/INVADERS",
+            "c8games/KALEID","c8games/MAZE","c8games/MERLIN","c8games/MISSILE",
+            "c8games/PONG","c8games/PONG2","c8games/PUZZLE","c8games/SYZYGY",
+            "c8games/TANK","c8games/TETRIS","c8games/TICTAC","c8games/UFO",
+            "c8games/VBRIX","c8games/VERS","c8games/WIPEOFF", "1-chip8-logo.ch8", "2-ibm-logo.ch8", "3-corax+.ch8", "4-flags.ch8", "5-quirks.ch8", "6-keypad.ch8", "7-beep.ch8"
+        };
+
+        int rom_count = sizeof(list_rom) / sizeof(list_rom[0]);
+
+        int columns = 3;
+        int columnWidth = 180;
+        int startX = 30;
+        int startY = 90;
+        int lineHeight = 20;
+        int maxLines = (WINDOW_H - startY - 80) / lineHeight;
+
+        for (int i = 0; i < rom_count; i++) {
+            int col = i / maxLines;
+            int row = i % maxLines;
+            if (col >= columns) break;
+
+            SDL_Rect rect = {
+                startX + col * columnWidth,
+                startY + row * lineHeight,
+                columnWidth,
+                lineHeight
+            };
+
+            if (x >= rect.x && x <= rect.x + rect.w &&
+                y >= rect.y && y <= rect.y + rect.h) {
+
+                *selectedRom = list_rom[i];
+                *screen = SCREEN_EMULATION;
+                return;
+            }
+        }
+
+        SDL_Rect retour = {180, 330, 240, 50};
+        if (x >= retour.x && x <= retour.x + retour.w &&
+            y >= retour.y && y <= retour.y + retour.h) {
+            *screen = SCREEN_MENU;
+        }
+    }
+}
+
+
 void render_menu(SDL_Renderer* r, TTF_Font* font, int mouseX, int mouseY) {
     // Fond de la fenêtre
-    SDL_SetRenderDrawColor(r, 255, 200, 255, 255); // rose clair
+    SDL_SetRenderDrawColor(r, 255, 200, 255, 255);
     SDL_RenderClear(r);
 
     // Définition des boutons
@@ -104,6 +177,97 @@ void render_menu(SDL_Renderer* r, TTF_Font* font, int mouseX, int mouseY) {
     SDL_RenderPresent(r);
 }
 
+void render_select(SDL_Renderer* r, TTF_Font* font, int mouseX, int mouseY) {
+
+    // Fond de la fenêtre
+    SDL_SetRenderDrawColor(r, 255, 200, 255, 255);
+    SDL_RenderClear(r);
+
+    SDL_Color normalColor = {255, 38, 227, 255};
+    SDL_Color hoverColor  = {150, 0, 150, 255}; // plus foncé
+
+    const char* list_rom [] = {"c8games/15PUZZLE","c8games/BLINKY", "c8games/BLITZ", "c8games/BRIX", "c8games/CONNECT4", "c8games/GUESS", "c8games/HIDDEN", "c8games/INVADERS", "c8games/KALEID", "c8games/MAZE", "c8games/MERLIN", "c8games/MISSILE", "c8games/PONG", "c8games/PONG2", "c8games/PUZZLE", "c8games/SYZYGY", "c8games/TANK", "c8games/TETRIS", "c8games/TICTAC", "c8games/UFO", "c8games/VBRIX", "c8games/VERS", "c8games/WIPEOFF", "1-chip8-logo.ch8", "2-ibm-logo.ch8", "3-corax+.ch8", "4-flags.ch8", "5-quirks.ch8", "6-keypad.ch8", "7-beep.ch8" };
+    
+    int rom_count = sizeof(list_rom) / sizeof(list_rom[0]);
+
+    int columns = 3;
+    int columnWidth = 180;
+    int startX = 30;
+    int startY = 90;
+    int lineHeight = 20;
+
+    int maxLines = (WINDOW_H - startY - 80) / lineHeight;
+
+
+    for (int i = 0; i < rom_count; i++) {
+        int col = i / maxLines;
+        int row = i % maxLines;
+
+        if (col >= columns) break;
+
+        SDL_Rect textRect = {
+            startX + col * columnWidth,
+            startY + row * lineHeight,
+            columnWidth,
+            lineHeight
+        };
+
+        SDL_Color color = normalColor;
+
+        // HOVER
+        if (mouseX >= textRect.x && mouseX <= textRect.x + textRect.w &&
+            mouseY >= textRect.y && mouseY <= textRect.y + textRect.h) {
+            color = hoverColor;
+        }
+
+        render_text_left(r, font, list_rom[i], textRect, color);
+    }
+
+
+
+    // Définition des boutons
+    SDL_Rect retour = {180, 330, 240, 50};
+    int border_thickness = 4;
+    SDL_Color borderColor = {255, 38, 227, 255}; // violet
+
+    // Couleurs pour chaque bouton
+    SDL_Color retourFill, retourText;
+
+
+    // Hover retour
+    if (mouseX >= retour.x && mouseX <= retour.x + retour.w &&
+        mouseY >= retour.y && mouseY <= retour.y + retour.h) {
+        retourFill = (SDL_Color){255, 38, 227, 255};
+        retourText = (SDL_Color){255, 200, 255, 255};
+    } else {
+        retourFill = (SDL_Color){255, 200, 255, 255};
+        retourText = (SDL_Color){255, 38, 227, 255};
+    }
+
+
+    // Dessin retour
+    SDL_SetRenderDrawColor(r, retourFill.r, retourFill.g, retourFill.b, retourFill.a);
+    SDL_RenderFillRect(r, &retour);
+    SDL_SetRenderDrawColor(r, borderColor.r, borderColor.g, borderColor.b, borderColor.a);
+    for (int i = 0; i < border_thickness; i++) {
+        SDL_Rect b = {retour.x - i, retour.y - i, retour.w + 2*i, retour.h + 2*i};
+        SDL_RenderDrawRect(r, &b);
+    }
+
+    // Texte des boutons
+    TTF_Font* font_text = TTF_OpenFont("arial.ttf", 32);
+    render_text(r, font_text, "RETOUR", retour, retourText);
+    // Titre
+    SDL_Rect titleRect = {0, 20, 600, 50};
+    TTF_Font* titleFont = TTF_OpenFont("arial.ttf", 48);
+    if (titleFont) {
+        render_text(r, titleFont, "PolyChip8", titleRect, (SDL_Color){255,38,227,255});
+        TTF_CloseFont(titleFont);
+    }
+
+    SDL_RenderPresent(r);
+}
+
 void render_text(SDL_Renderer* renderer, TTF_Font* font, const char* text, SDL_Rect rect, SDL_Color color) {
     SDL_Surface* surface = TTF_RenderText_Blended(font, text, color);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -124,14 +288,40 @@ void render_text(SDL_Renderer* renderer, TTF_Font* font, const char* text, SDL_R
     SDL_DestroyTexture(texture);
 }
 
+void render_text_left(SDL_Renderer* renderer, TTF_Font* font,
+                      const char* text, SDL_Rect rect, SDL_Color color)
+{
+    SDL_Surface* surface = TTF_RenderText_Blended(font, text, color);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+    int textW, textH;
+    SDL_QueryTexture(texture, NULL, NULL, &textW, &textH);
+
+    SDL_Rect dst = {
+        rect.x + 4,                      // marge gauche
+        rect.y + (rect.h - textH) / 2,   // centré verticalement
+        textW,
+        textH
+    };
+
+    SDL_RenderCopy(renderer, texture, NULL, &dst);
+
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
+}
+
+
 
 int main(void) {
     struct memory mem = {0};
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER);
+    const char* selectedRom = NULL;
 
     TTF_Init();  // Initialisation de SDL_ttf
-    TTF_Font* font = TTF_OpenFont("arial.ttf", 32); // mettre le chemin d'une police existante
-    if (!font) {
+    TTF_Font* fontMenu  = TTF_OpenFont("arial.ttf", 32);
+    TTF_Font* fontList  = TTF_OpenFont("arial.ttf", 16);
+
+    if (!fontMenu || !fontList) {
         fprintf(stderr, "Erreur TTF_OpenFont: %s\n", TTF_GetError());
         return 1;
     }
@@ -186,17 +376,45 @@ int main(void) {
             SDL_GetMouseState(&mouseX, &mouseY);
 
             while (SDL_PollEvent(&event)) {
-                if (event.type == SDL_QUIT)
-                    running = 0;
+                if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(dsp.window)) {
+                    Display_CLS(&dsp);          // clear proprement
+                    SDL_HideWindow(dsp.window);
 
+                    screen = SCREEN_ROM_SELECT; // Retour au menu de sélection
+                    emuReady = 0;
+                    SDL_HideWindow(dsp.window);
+                    continue; // passe au prochain événement
+            }
+                if (event.type == SDL_QUIT) {
+                    if (screen==SCREEN_EMULATION) {
+                        Display_CLS(&dsp);
+                        SDL_HideWindow(dsp.window);
+                        
+                        screen = SCREEN_ROM_SELECT;
+                        emuReady = 0;
+
+                    }
+                    else {
+                        running = 0;
+                    }
+                }
                 if (screen == SCREEN_MENU) {
                     handle_menu_events(&screen, &running, event);
+                }
+                if (screen == SCREEN_ROM_SELECT) {
+                    handle_select_events(&screen, &running, event, mouseX, mouseY, &selectedRom);
+
                 }
             }
 
             if (screen == SCREEN_MENU) {
                 SDL_HideWindow(dsp.window);
-                render_menu(menuRenderer, font, mouseX, mouseY);
+                render_menu(menuRenderer, fontMenu, mouseX, mouseY);
+            }
+
+            else if (screen==SCREEN_ROM_SELECT) {
+                SDL_HideWindow(dsp.window);
+                render_select(menuRenderer, fontList, mouseX, mouseY);
             }
 
             else if (screen == SCREEN_EMULATION) {
@@ -205,7 +423,9 @@ int main(void) {
 
                 if (!emuReady) {
                     memset(&mem, 0, sizeof(mem));
-                    memory_load_rom(&mem, "c8games/VERS", START_ADDRESS);
+                    if (selectedRom) {
+                        memory_load_rom(&mem, selectedRom, START_ADDRESS);
+                    }
                     processor_init(&cpu, &mem, &dsp, &kb, &spk);
                     emuReady = 1;
                 }
@@ -220,7 +440,8 @@ int main(void) {
         Display_destroy(&dsp);
         Keyboard_destroy(&kb);
         Speaker_destroy(&spk);
-        TTF_CloseFont(font);
+        TTF_CloseFont(fontMenu);
+        TTF_CloseFont(fontList);
         TTF_Quit();
         SDL_Quit();
 
