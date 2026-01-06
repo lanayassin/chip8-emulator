@@ -170,7 +170,7 @@ void render_menu(SDL_Renderer* r, TTF_Font* font, int mouseX, int mouseY) {
 
     // Titre
     SDL_Rect titleRect = {0, 50, 600, 50};
-    TTF_Font* titleFont = TTF_OpenFont("arial.ttf", 48);
+    TTF_Font* titleFont = TTF_OpenFont("Audiowide-Regular.ttf", 48);
     if (titleFont) {
         render_text(r, titleFont, "PolyChip8", titleRect, (SDL_Color){255,38,227,255});
         TTF_CloseFont(titleFont);
@@ -257,11 +257,11 @@ void render_select(SDL_Renderer* r, TTF_Font* font, int mouseX, int mouseY) {
     }
 
     // Texte des boutons
-    TTF_Font* font_text = TTF_OpenFont("arial.ttf", 32);
+    TTF_Font* font_text = TTF_OpenFont("Comfortaa-VariableFont_wght.ttf", 32);
     render_text(r, font_text, "RETOUR", retour, retourText);
     // Titre
     SDL_Rect titleRect = {0, 20, 600, 50};
-    TTF_Font* titleFont = TTF_OpenFont("arial.ttf", 48);
+    TTF_Font* titleFont = TTF_OpenFont("Audiowide-Regular.ttf", 48);
     if (titleFont) {
         render_text(r, titleFont, "PolyChip8", titleRect, (SDL_Color){255,38,227,255});
         TTF_CloseFont(titleFont);
@@ -320,8 +320,8 @@ int main(void) {
     const char* selectedRom = NULL;
 
     TTF_Init();  // Initialisation de SDL_ttf
-    TTF_Font* fontMenu  = TTF_OpenFont("arial.ttf", 32);
-    TTF_Font* fontList  = TTF_OpenFont("arial.ttf", 16);
+    TTF_Font* fontMenu  = TTF_OpenFont("Comfortaa-VariableFont_wght.ttf", 32);
+    TTF_Font* fontList  = TTF_OpenFont("Comfortaa-VariableFont_wght.ttf", 16);
 
     if (!fontMenu || !fontList) {
         fprintf(stderr, "Erreur TTF_OpenFont: %s\n", TTF_GetError());
