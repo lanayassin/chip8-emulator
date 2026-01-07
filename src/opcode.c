@@ -50,7 +50,7 @@ void op_2(struct processor *cpu , uint16_t opcode){
 // 0x3xkk : SE Vx, byte 
 void op_3(struct processor *cpu , uint16_t opcode){
     uint8_t x = (opcode & 0x0F00) >> 8 ;
-    uint8_t kk = opcode & 0x00FF;
+    uint8_t kk = (uint8_t)(opcode & 0x00FF);
     if (cpu->V[x]== kk){
         cpu->PC += 2 ;
     }
@@ -59,7 +59,7 @@ void op_3(struct processor *cpu , uint16_t opcode){
 //4xkk : SNE Vx, byte
 void op_4(struct processor *cpu , uint16_t opcode){
     uint8_t x = (opcode & 0x0F00) >> 8 ;
-    uint8_t kk = opcode & 0x00FF;
+    uint8_t kk = (uint8_t)(opcode & 0x00FF);
     if (cpu->V[x] != kk){
         cpu->PC += 2 ;
     }
@@ -81,14 +81,14 @@ void op_5(struct processor *cpu , uint16_t opcode){
 // 6xkk : LD Vx, byte 
 void op_6(struct processor *cpu , uint16_t opcode){
     uint8_t x = (opcode & 0x0F00) >> 8 ;
-    uint8_t kk = opcode & 0x00FF;
+    uint8_t kk = (uint8_t)(opcode & 0x00FF);
     cpu->V[x] = kk ;
 }
 
 // 7xkk : ADD Vx, byte
 void op_7(struct processor *cpu , uint16_t opcode){
     uint8_t x = (opcode & 0x0F00) >> 8 ;
-    uint8_t kk = opcode & 0x00FF;
+    uint8_t kk = (uint8_t)(opcode & 0x00FF);
     cpu->V[x] += kk ;
 }
 
@@ -121,11 +121,11 @@ void op_8(struct processor *cpu, uint16_t opcode) {
     else if (n == 0x4) {
         uint16_t resultat = cpu->V[x] +cpu->V[y];
         if (resultat > 255) {
-        cpu->V[x] = resultat;
+        cpu->V[x] = (uint8_t)resultat;
         cpu->V[0xF] = 1;
         }
         else{
-        cpu->V[x] = resultat;
+        cpu->V[x] = (uint8_t)resultat;
         cpu->V[0xF] = 0;
         }
 
@@ -201,7 +201,7 @@ void op_B(struct processor *cpu , uint16_t opcode){
 //Cxkk - RND Vx, byte
 void op_C(struct processor *cpu , uint16_t opcode) {
     uint8_t x = (opcode & 0x0F00) >> 8;
-    uint8_t kk = (opcode & 0x00FF);
+    uint8_t kk = (uint8_t)(opcode & 0x00FF);
 
     uint8_t rnd = (uint8_t)(rand() % 256);
     
@@ -239,7 +239,7 @@ void op_D(struct processor *cpu, uint16_t opcode) {
 
 void op_E(struct processor *cpu, uint16_t opcode){
     uint8_t x  = (opcode & 0x0F00) >> 8;
-    uint8_t nn = (opcode & 0x00FF);
+    uint8_t nn = (uint8_t)(opcode & 0x00FF);
     int state;
 
     if (nn==0xA1) {
@@ -261,7 +261,7 @@ void op_E(struct processor *cpu, uint16_t opcode){
 
 void op_F(struct processor *cpu, uint16_t opcode) {
     uint8_t x  = (opcode & 0x0F00) >> 8;
-    uint8_t nn = (opcode & 0x00FF);
+    uint8_t nn = (uint8_t)(opcode & 0x00FF);
 
     if (nn == 0x07) {
         cpu->V[x] = cpu->DT;
@@ -303,14 +303,14 @@ void op_F(struct processor *cpu, uint16_t opcode) {
         for (uint8_t i = 0; i <= x; i++) {
             memory_write(cpu->RAM, cpu->I + i, cpu->V[i]);
         }
-        cpu->I += x + 1;
+        cpu->I += (uint16_t)(x + 1);
     }
  
     if (nn == 0x65) {
         for (uint8_t i = 0; i <= x; i++) {
             memory_read(cpu->RAM, cpu->I + i, &cpu->V[i]);
         }
-        cpu->I += x + 1;
+        cpu->I += (uint16_t)(x + 1);
     }
 }
 

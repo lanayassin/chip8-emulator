@@ -129,7 +129,7 @@ void processor_step(struct processor *cpu) {
     }
 
     uint16_t opcode = processor_fetch(cpu);
-    uint8_t op = (opcode & 0xF000) >> 12;
+    uint8_t op = (uint8_t)((opcode & 0xF000) >> 12);
 
     opcode_handler handler = dispatch[op];
     if (handler) {

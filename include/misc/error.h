@@ -48,7 +48,7 @@ extern int errcode;
  *
  * The returned string is statically allocated and shall neither be modified, nor freed.
  */
-const char* errorstr ();
+const char* errorstr(void);
 
 #define QUIT      1
 #define MALLOC    2
