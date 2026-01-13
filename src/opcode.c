@@ -1,12 +1,23 @@
+/**
+ * @file opcode.c
+ * @brief Implémentation des instructions Chip-8.
+ * 
+ * Ce fichier contient l'implémentation de l'ensemble des opcodes Chip-8.
+ * Il contient aussi la table de dispatch permettant leur exécution.
+ */
 #include "opcode.h"
 #include "processor.h"
 #include "memory.h"
-#include <stdlib.h>
 #include "keyboard/keyboard.h"
 #include <stdlib.h>  
 #include <time.h>
 #include <string.h>
 
+/**
+ * @brief Table de dispatch des opcodes.
+ * 
+ * Chaque entrée pointe vers la focntion chargée d'exécuter un opcode.
+ */
 void (*dispatch[16])(struct processor *cpu, uint16_t opcode) = {
     op_0, op_1, op_2, op_3,
     op_4, op_5, op_6, op_7,
@@ -14,7 +25,16 @@ void (*dispatch[16])(struct processor *cpu, uint16_t opcode) = {
     op_C, op_D, op_E, op_F
 };
 
-// 0x0000 : Instructions Système
+/**
+ * @brief Instructions système (0x0NNN).
+ * 
+ * Gère :
+ * - 00E0 : effacement de l'écran
+ * - 00EE : retour de sous-programme
+ * 
+ * @param cpu Processeur
+ * @param opcode Opcode à exécuter
+ */
 void op_0(struct processor *cpu, uint16_t opcode) {
     if (opcode == 0x00E0 && cpu->Display) {
         Display_CLS(cpu->Display);
@@ -30,13 +50,27 @@ void op_0(struct processor *cpu, uint16_t opcode) {
     }
 }
 
-// 0x1nnn : JP addr
+/**
+ * @brief Saut à l'adresse NNN.
+ * @opcode 1nnn
+ * 
+ * @param cpu Processeur
+ * @param opcode Opcode à exécuter
+ */
 void op_1(struct processor *cpu , uint16_t opcode) {
     uint16_t adrr = opcode & 0x0FFF ;
     cpu->PC = adrr;
 }
 
-// 0x2nnn : CALL addr
+/**
+ * @brief Appel de sous-programme.
+ * @opcode : 2nnn
+ * 
+ * Empile l'adresse courante puis saute à l'adresse donnée.
+ * 
+ * @param cpu Processeur
+ * @param opcode Opcode à exécuter
+ */
 void op_2(struct processor *cpu , uint16_t opcode){
     if (cpu->SP >= STACK_SIZE) {
         fprintf(stderr, "Stack overflow at CALL!\n");
@@ -47,7 +81,13 @@ void op_2(struct processor *cpu , uint16_t opcode){
     cpu->PC = adrr;
 }
 
-// 0x3xkk : SE Vx, byte 
+/**
+ * @brief Saute l'instruction si VX==KK.
+ * @opcode 3xkk
+ * 
+ * @param cpu Processeur
+ * @param opcode Opcode à exécuter
+ */
 void op_3(struct processor *cpu , uint16_t opcode){
     uint8_t x = (opcode & 0x0F00) >> 8 ;
     uint8_t kk = (uint8_t)(opcode & 0x00FF);
@@ -56,7 +96,13 @@ void op_3(struct processor *cpu , uint16_t opcode){
     }
 }
 
-//4xkk : SNE Vx, byte
+/**
+ * @brief Saute l'instruction si Vx!=KK.
+ * @opcode 4xkk
+ * 
+ * @param cpu Processeur
+ * @param opcode Opcode à exécuter
+ */
 void op_4(struct processor *cpu , uint16_t opcode){
     uint8_t x = (opcode & 0x0F00) >> 8 ;
     uint8_t kk = (uint8_t)(opcode & 0x00FF);
@@ -65,7 +111,13 @@ void op_4(struct processor *cpu , uint16_t opcode){
     }
 }
 
-// 5xy0 : SE Vx, Vy
+/**
+ * @brief Saute l'instruction si Vx==Vy.
+ * @opcode 5xy0
+ * 
+ * @param cpu Processeur
+ * @param opcode Opcode à exécuter
+ */
 void op_5(struct processor *cpu , uint16_t opcode){
     if ((opcode & 0x000F) == 0x0) {
         uint8_t x = (opcode & 0x0F00) >> 8 ;
@@ -74,25 +126,44 @@ void op_5(struct processor *cpu , uint16_t opcode){
             cpu->PC += 2 ;
         }
     }
-
-    
 }
 
-// 6xkk : LD Vx, byte 
+/**
+ * @brief Charge kk dans Vx.
+ * @opcode 6xkk
+ * 
+ * @param cpu Processeur
+ * @param opcode Opcode à exécuter
+ */
 void op_6(struct processor *cpu , uint16_t opcode){
     uint8_t x = (opcode & 0x0F00) >> 8 ;
     uint8_t kk = (uint8_t)(opcode & 0x00FF);
     cpu->V[x] = kk ;
 }
 
-// 7xkk : ADD Vx, byte
+/**
+ * @brief Ajoute kk à Vx.
+ * @opcode 7xkk
+ * 
+ * @param cpu Processeur
+ * @param opcode Opcode à exécuter
+ */
 void op_7(struct processor *cpu , uint16_t opcode){
     uint8_t x = (opcode & 0x0F00) >> 8 ;
     uint8_t kk = (uint8_t)(opcode & 0x00FF);
     cpu->V[x] += kk ;
 }
 
-// 8xyN
+/**
+ * @brief Instruction arithmétiques et logiques.
+ * @opcode 8xyN
+ * 
+ * Gère les opérations :
+ * LD, OR, AND, XOR, ADD, SUB, SHR, SUBN, SHL
+ * 
+ * @param cpu Processeur
+ * @param opcode Opcode à exécuter
+ */
 void op_8(struct processor *cpu, uint16_t opcode) {
     uint8_t x = (opcode & 0x0F00) >> 8;
     uint8_t y = (opcode & 0x00F0) >> 4;
@@ -170,12 +241,16 @@ void op_8(struct processor *cpu, uint16_t opcode) {
             cpu->V[x]= cpu->V[y] << 1;
             cpu->V[0xF] = 0;
         }
-        //cpu->V[0xF] = (cpu->V[x] & 0x80) >> 7; // On sauve le bit de poids fort (MSB)
-        //cpu->V[x] <<= 1;
     }
 }
 
-//9xy0 : SNE Vx, Vy
+/**
+ * @brief Saute l'instruction si Vx!=Vy.
+ * @opcode 9xy0
+ * 
+ * @param cpu Processeur
+ * @param opcode Opcode à exécuter
+ */
 void op_9 (struct processor *cpu , uint16_t opcode){
     if ((opcode & 0x000F) == 0x0) {
         uint8_t x = (opcode & 0x0F00) >> 8 ;
@@ -186,19 +261,37 @@ void op_9 (struct processor *cpu , uint16_t opcode){
     }
 }
 
-//Annn : LD I, addr
+/**
+ * @brief Charge une adresse dans le registre I.
+ * @opcode Annn
+ * 
+ * @param cpu Processeur
+ * @param opcode Opcode à exécuter
+ */
 void op_A(struct processor *cpu , uint16_t opcode){
     uint16_t adrr = opcode & 0x0FFF ;
     cpu->I = adrr ; 
 }
 
-//Bnnn : JP V0, addr
+/**
+ * @brief Saut à l'adresse nnn+V0
+ * @opcode Bnnn
+ * 
+ * @param cpu Processeur
+ * @param opcode Opcode à exécuter
+ */
 void op_B(struct processor *cpu , uint16_t opcode){
     uint16_t adrr = opcode & 0x0FFF ;
     cpu->PC = adrr + cpu->V[0];
 }
 
-//Cxkk - RND Vx, byte
+/**
+ * @brief Génère un nombre aléatoire masqué.
+ * @opcode Cxkk
+ * 
+ * @param cpu Processeur
+ * @param opcode Opcode à exécuter
+ */
 void op_C(struct processor *cpu , uint16_t opcode) {
     uint8_t x = (opcode & 0x0F00) >> 8;
     uint8_t kk = (uint8_t)(opcode & 0x00FF);
@@ -207,7 +300,16 @@ void op_C(struct processor *cpu , uint16_t opcode) {
     
     cpu->V[x] = rnd & kk;   
 }
-//Dxyn - DRW Vx, Vy, nibble
+
+/**
+ * @brief Dessine un sprite à l'écran.
+ * @opcode Dxyn
+ * 
+ * Met à jour le flag VF en cas de collision.
+ * 
+ * @param cpu Processeur
+ * @param opcode Opcode à exécuter
+ */
 void op_D(struct processor *cpu, uint16_t opcode) {
     uint8_t x = (opcode & 0x0F00) >> 8 ;
     uint8_t y = (opcode & 0x00F0) >> 4 ;
@@ -237,6 +339,13 @@ void op_D(struct processor *cpu, uint16_t opcode) {
     Sprite_destroy(&spr);
 }
 
+/**
+ * @brief Instructions liées au clavier.
+ * @opcode Ex9E/ExA1
+ * 
+ * @param cpu Processeur
+ * @param opcode Opcode à exécuter
+ */
 void op_E(struct processor *cpu, uint16_t opcode){
     uint8_t x  = (opcode & 0x0F00) >> 8;
     uint8_t nn = (uint8_t)(opcode & 0x00FF);
@@ -259,6 +368,15 @@ void op_E(struct processor *cpu, uint16_t opcode){
     }
 }
 
+/**
+ * @brief Instructions diverses.
+ * @opcode Fx**
+ * 
+ * Gère timers, mémoire, clavier et BCD.
+ * 
+ * @param cpu Processeur
+ * @param opcode Opcode à exécuter
+ */
 void op_F(struct processor *cpu, uint16_t opcode) {
     uint8_t x  = (opcode & 0x0F00) >> 8;
     uint8_t nn = (uint8_t)(opcode & 0x00FF);

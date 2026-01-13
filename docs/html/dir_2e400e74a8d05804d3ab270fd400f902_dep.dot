@@ -1,0 +1,11 @@
+digraph "speaker"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  compound=true
+  dir_2e400e74a8d05804d3ab270fd400f902 [label="speaker", fillcolor="#edf0f7", color="grey25", style="filled,bold", URL="dir_2e400e74a8d05804d3ab270fd400f902.html",tooltip=""];
+  dir_a52f4d3d586a58b02f3a4ddf0a992157 [label="misc", fillcolor="#edf0f7", color="grey25", style="filled", URL="dir_a52f4d3d586a58b02f3a4ddf0a992157.html",tooltip=""];
+  dir_2e400e74a8d05804d3ab270fd400f902->dir_a52f4d3d586a58b02f3a4ddf0a992157 [headlabel="1", labeldistance=1.5 headhref="dir_000003_000002.html" href="dir_000003_000002.html" color="steelblue1" fontcolor="steelblue1"];
+}

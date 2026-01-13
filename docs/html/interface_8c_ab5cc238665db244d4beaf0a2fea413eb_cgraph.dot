@@ -1,0 +1,13 @@
+digraph "render_select"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node1 [id="Node000001",label="render_select",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip="Affiche l'écran de sélection des ROM."];
+  Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="render_text",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$interface_8c.html#a917bec19c25322afd31eac27ecdbb6b4",tooltip="Affiche un texte centré dans un rectangle."];
+  Node1 -> Node3 [id="edge2_Node000001_Node000003",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="render_text_left",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$interface_8c.html#ac12cf195bda7bc028c277b14db7d6a25",tooltip="Affiche un texte aligné à gauche dans un rectangle."];
+}

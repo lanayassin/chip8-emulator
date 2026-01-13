@@ -1,0 +1,97 @@
+# ============================================================
+# Projet
+# ============================================================
+
+PROJECT_NAME           = "Chip-8 Emulator"
+PROJECT_BRIEF          = "Émulateur Chip-8 en C"
+PROJECT_NUMBER         = 1.0
+
+OUTPUT_DIRECTORY       = docs
+CREATE_SUBDIRS         = NO
+
+# ============================================================
+# Entrées
+# ============================================================
+INPUT                  = ACCUEIL.md src include
+FILE_PATTERNS          = *.c *.h *.md
+RECURSIVE              = YES
+EXCLUDE                = lib
+
+MARKDOWN_SUPPORT       = YES
+
+# ============================================================
+# Extraction de la documentation
+# ============================================================
+
+EXTRACT_ALL            = YES
+EXTRACT_STATIC         = YES
+EXTRACT_STRUCTS        = YES
+EXTRACT_ENUMS          = YES
+EXTRACT_FILES          = YES
+WARN_IF_UNDOCUMENTED   = NO
+STRUCT_RELATIONS       = YES      
+# ============================================================
+# Messages et warnings
+# ============================================================
+
+WARNINGS               = YES
+WARN_IF_DOC_ERROR      = YES
+
+# ============================================================
+# Sorties
+# ============================================================
+
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+GENERATE_LATEX         = NO
+
+# ============================================================
+# Apparence
+# ============================================================
+
+FULL_PATH_NAMES        = NO
+STRIP_FROM_PATH        = .
+SHOW_FILES             = YES
+SHOW_NAMESPACES        = NO
+
+# Graphviz / architecture
+HAVE_DOT               = YES
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+DOT_IMAGE_FORMAT       = png
+DOT_GRAPH_MAX_NODES    = 50
+CLASS_DIAGRAMS         = NO      
+INCLUDE_GRAPH          = YES      
+INCLUDED_BY_GRAPH      = YES      
+DIRECTORY_GRAPH        = YES      
+DOTFILE_DIRS           = src include
+DOT_TRANSPARENT        = YES
+DOT_MULTI_TARGETS      = YES
+
+# Couleurs HTML (optionnel)
+HTML_COLORSTYLE_HUE    = 220
+HTML_COLORSTYLE_SAT    = 100
+HTML_COLORSTYLE_GAMMA  = 80
+
+# ============================================================
+# Langage
+# ============================================================
+
+OPTIMIZE_OUTPUT_FOR_C  = YES
+C_EXTRACT_ALL          = YES
+
+# ============================================================
+# Macros / Préprocesseur
+# ============================================================
+
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = NO
+PREDEFINED             = __attribute__(x)=
+
+# ============================================================
+# Divers
+# ============================================================
+
+QUIET                  = NO
+USE_MDFILE_AS_MAINPAGE = ACCUEIL.md
